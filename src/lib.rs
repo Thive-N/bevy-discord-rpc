@@ -12,14 +12,16 @@
 //! fn main() {
 //!     println!("hello world!");
 //!     let mut app = App::new();
-//!     app.add_plugins(DefaultPlugins);
-//!     app.add_plugin(RPCPlugin {
-//!         config: RPCConfig {
-//!             app_id: 425407036495495169,
-//!             show_time: true,
+//!     app.add_plugins(( 
+//!         DefaultPlugins, 
+//!         RPCPlugin {
+//!             config: RPCConfig {
+//!                 app_id: 425407036495495169,
+//!                 show_time: true,
+//!             }
 //!         }
-//!     });
-//!     app.add_system(update_presence);
+//!     ));
+//!     app.add_systems(Update, update_presence);
 //!
 //!     app.run();
 //! }
@@ -35,7 +37,7 @@ use bevy::{log::prelude::*, prelude::*};
 use discord_presence::{models::ActivityTimestamps, Client as DiscordClient, Event};
 
 /// The Discord configuration
-mod config;
+pub mod config;
 /// The state that holds the Discord activity
 mod state;
 
@@ -63,8 +65,8 @@ impl Plugin for RPCPlugin {
         // NOTE: I am aware this is deprecated
         // For now, for the sake of backwards compatability with old Bevy versions we will keep using this
         // If Bevy removes these functions in future, this will change
-        app.add_startup_system(startup_client);
-        app.add_system(check_activity_changed);
+        app.add_systems(Startup, startup_client);
+        app.add_systems(Update, check_activity_changed);
         debug!("Added systems");
 
         app.insert_resource::<RPCConfig>(client_config);
